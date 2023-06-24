@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Recipes.Api.Models;
 
 namespace Recipes.Api.Data;
 
@@ -25,5 +26,6 @@ public class DataContext : DbContext
     }
     
     //Db Sets:
+    public DbSet<Recipe> Recipe { get; set; }
 
 }
