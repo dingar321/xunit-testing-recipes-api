@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Recipes.Api.Models;
 
 namespace Recipes.Api.Controllers
 {
