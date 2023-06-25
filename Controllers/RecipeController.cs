@@ -19,12 +19,12 @@ public class RecipeController : ControllerBase
     /// Creates a new recipe
     /// </summary>
     /// <response code="201"> Created a new recipe </response>
-    /// <response code="400"> The body for a new recipe was not valid</response>
+    /// <response code="400"> The body for a new recipe was not valid </response>
     [HttpPost]
     [Route("create")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateRecipe(
+    public async Task<IActionResult> Create(
         [FromBody] RecipeDto newRecipe)
     {
         await _recipeService.CreateRecipe(
@@ -37,5 +37,32 @@ public class RecipeController : ControllerBase
             });
 
         return Ok(); 
+    }
+
+    /// <summary>
+    /// Updates a specified recipe
+    /// </summary>
+    /// <response code="200"> Specified Recipe was updated </response>
+    /// <response code="400"> The body for the updated recipe was not valid </response>
+    [HttpPost]
+    [Route("update")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Edit(
+        [FromBody] RecipeDto updateRecipe,
+        [FromQuery] int id) 
+    {
+
+        await _recipeService.EditRecipe(
+            id,
+            new Recipe
+            {
+                RecipeName = updateRecipe.RecipeName,
+                Description = updateRecipe.Description,
+                Ingredients = updateRecipe.Ingredients,
+                Instructions = updateRecipe.Instructions
+            });
+
+        return Ok();
     }
 }
