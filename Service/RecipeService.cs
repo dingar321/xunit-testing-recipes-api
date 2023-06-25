@@ -6,13 +6,13 @@ namespace Recipes.Api.Service;
 
 public interface IRecipeService
 {
-    Task CreateRecipe(string recipeName, string description, string ingredients, string instructions);
-    Task EditRecipe(int id, string recipeName, string description, string ingredients, string instructions);
+    Task CreateRecipe(Recipe newRecipe);
+    Task EditRecipe(int id, Recipe updatedRecipe);
     Task DeleteRecipeAsync(int id);
     Task<Recipe?> GetRecipe(int id);
     Task<IEnumerable<Recipe>> GetRecipes();
 }
-
+    
 public class RecipeService : IRecipeService
 {
     private readonly DataContext _dataContext;
@@ -22,34 +22,22 @@ public class RecipeService : IRecipeService
         _dataContext = dataContext;
     }
 
-    public async Task CreateRecipe(
-        string recipeName, string description, 
-        string ingredients, string instructions) 
+    public async Task CreateRecipe(Recipe newRecipe) 
     {
-        var newRecipe = new Recipe
-        {
-           RecipeName = recipeName,
-           Description = description,   
-           Ingredients = ingredients,
-           Instructions = instructions
-        };
-
         _dataContext.Recipe.Add(newRecipe);
         await _dataContext.SaveChangesAsync();
     }
 
-    public async Task EditRecipe(
-        int id, string recipeName, string description,
-        string ingredients, string instructions) 
+    public async Task EditRecipe(int id, Recipe updatedRecipe) 
     {
         var foundRecipe = _dataContext.Recipe.FirstOrDefault(x => x.Id == id);
 
         if (foundRecipe is not null)
         {
-            foundRecipe.RecipeName = recipeName ?? foundRecipe.RecipeName;
-            foundRecipe.Description = description ?? foundRecipe.RecipeName;
-            foundRecipe.Ingredients = ingredients ?? foundRecipe.RecipeName;
-            foundRecipe.Instructions = instructions ?? foundRecipe.RecipeName;
+            foundRecipe.RecipeName = updatedRecipe.RecipeName ?? foundRecipe.RecipeName;
+            foundRecipe.Description = updatedRecipe.Description ?? foundRecipe.Description;
+            foundRecipe.Ingredients = updatedRecipe.Ingredients ?? foundRecipe.Ingredients;
+            foundRecipe.Instructions = updatedRecipe.Instructions ?? foundRecipe.Instructions;
         }
 
         await _dataContext.SaveChangesAsync();
