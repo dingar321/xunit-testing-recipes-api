@@ -5,7 +5,7 @@ using Recipes.Api.Service;
 namespace Recipes.Api.Controllers;
 
 [ApiController]
-[Route("recipes")] 
+[Route("recipes")]
 public class RecipeController : ControllerBase
 {
     private readonly IRecipeService _recipeService;
@@ -28,7 +28,7 @@ public class RecipeController : ControllerBase
         [FromBody] RecipeDto newRecipe)
     {
         await _recipeService.CreateRecipe(
-            new Recipe
+            new RecipeDto
             {
                 RecipeName = newRecipe.RecipeName,
                 Description = newRecipe.Description,
@@ -36,26 +36,31 @@ public class RecipeController : ControllerBase
                 Instructions = newRecipe.Instructions
             });
 
-        return Ok(); 
+        return Ok();
     }
 
     /// <summary>
     /// Updates a specified recipe
     /// </summary>
-    /// <response code="200"> Specified Recipe was updated </response>
+    /// <response code="200"> Specified recipe was updated </response>
     /// <response code="400"> The body for the updated recipe was not valid </response>
+    /// <response code="404"> Specified recipe was not found </response>
     [HttpPost]
     [Route("update")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Edit(
         [FromBody] RecipeDto updateRecipe,
-        [FromQuery] int id) 
+        [FromQuery] int id)
     {
+        var foundRecipeDto = await _recipeService.GetRecipe(id);
 
-        await _recipeService.EditRecipe(
+        if (foundRecipeDto is not null)
+        {
+            await _recipeService.EditRecipe(
             id,
-            new Recipe
+            new RecipeDto
             {
                 RecipeName = updateRecipe.RecipeName,
                 Description = updateRecipe.Description,
@@ -63,6 +68,32 @@ public class RecipeController : ControllerBase
                 Instructions = updateRecipe.Instructions
             });
 
-        return Ok();
+            return Ok();
+        }
+
+        return NotFound();
+    }
+
+    /// <summary>
+    /// Deletes a specified recipe
+    /// </summary>
+    /// <response code="200"> Specified recipe was deleted </response>
+    /// <response code="404"> Specified recipe was not found </response>
+    [HttpDelete]
+    [Route("delete")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(
+        [FromQuery] int id) 
+    {
+        var foundRecipeDto = await _recipeService.GetRecipe(id);
+
+        if (foundRecipeDto is not null)
+        {
+            await _recipeService.DeleteRecipe(id);
+            return Ok();
+        } 
+
+        return NotFound();
     }
 }

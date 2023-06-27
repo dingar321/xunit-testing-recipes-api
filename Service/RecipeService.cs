@@ -6,11 +6,11 @@ namespace Recipes.Api.Service;
 
 public interface IRecipeService
 {
-    Task CreateRecipe(Recipe newRecipe);
-    Task EditRecipe(int id, Recipe updatedRecipe);
-    Task DeleteRecipeAsync(int id);
-    Task<Recipe?> GetRecipe(int id);
-    Task<IEnumerable<Recipe>> GetRecipes();
+    Task CreateRecipe(RecipeDto newRecipeDto);
+    Task EditRecipe(int id, RecipeDto updatedRecipeDto);
+    Task DeleteRecipe(int id);
+    Task<RecipeDto?> GetRecipe(int id);
+    Task<IEnumerable<RecipeDto>> GetRecipes();
 }
     
 public class RecipeService : IRecipeService
@@ -22,28 +22,28 @@ public class RecipeService : IRecipeService
         _dataContext = dataContext;
     }
 
-    public async Task CreateRecipe(Recipe newRecipe) 
+    public async Task CreateRecipe(RecipeDto newRecipeDto) 
     {
-        _dataContext.Recipe.Add(newRecipe);
+        _dataContext.Recipe.Add(newRecipeDto.MapToDomain());
         await _dataContext.SaveChangesAsync();
     }
 
-    public async Task EditRecipe(int id, Recipe updatedRecipe) 
+    public async Task EditRecipe(int id, RecipeDto updatedRecipeDto) 
     {
         var foundRecipe = _dataContext.Recipe.FirstOrDefault(x => x.Id == id);
 
         if (foundRecipe is not null)
         {
-            foundRecipe.RecipeName = updatedRecipe.RecipeName ?? foundRecipe.RecipeName;
-            foundRecipe.Description = updatedRecipe.Description ?? foundRecipe.Description;
-            foundRecipe.Ingredients = updatedRecipe.Ingredients ?? foundRecipe.Ingredients;
-            foundRecipe.Instructions = updatedRecipe.Instructions ?? foundRecipe.Instructions;
+            foundRecipe.RecipeName = updatedRecipeDto.RecipeName ?? foundRecipe.RecipeName;
+            foundRecipe.Description = updatedRecipeDto.Description ?? foundRecipe.Description;
+            foundRecipe.Ingredients = updatedRecipeDto.Ingredients ?? foundRecipe.Ingredients;
+            foundRecipe.Instructions = updatedRecipeDto.Instructions ?? foundRecipe.Instructions;
         }
 
         await _dataContext.SaveChangesAsync();
     }
 
-    public async Task DeleteRecipeAsync(int id) 
+    public async Task DeleteRecipe(int id) 
     {
         var foundRecipe = _dataContext.Recipe.FirstOrDefault(x => x.Id == id);
 
@@ -54,18 +54,19 @@ public class RecipeService : IRecipeService
         }
     }
 
-    public async Task<Recipe?> GetRecipe(int id) 
+    public async Task<RecipeDto?> GetRecipe(int id) 
     {
         var foundRecipe = await _dataContext.Recipe.FirstOrDefaultAsync(x => x.Id == id);
 
         if (foundRecipe is not null)
-            return foundRecipe;
+            return foundRecipe.MapToDto();
         else
             return null;
     }
 
-    public async Task<IEnumerable<Recipe>> GetRecipes()
+    public async Task<IEnumerable<RecipeDto>> GetRecipes()
     {
-        return await _dataContext.Recipe.ToArrayAsync();
+        var recipesList = await _dataContext.Recipe.ToArrayAsync();
+        return recipesList.Select(recipe => recipe.MapToDto());
     }
 }
