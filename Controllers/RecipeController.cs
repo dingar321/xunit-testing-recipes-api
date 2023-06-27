@@ -96,4 +96,24 @@ public class RecipeController : ControllerBase
 
         return NotFound();
     }
+
+    /// <summary>
+    /// Gets a specified recipe
+    /// </summary>
+    /// <response code="200"> Specified recipe was retrieved </response>
+    /// <response code="404"> Specified recipe was not found </response>
+    [HttpGet]
+    [Route("get-by-id")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<RecipeDto>> GetRecipe(
+        [FromQuery] int id)
+    {
+        var foundRecipeDto = await _recipeService.GetRecipe(id);
+
+        if (foundRecipeDto is not null)
+            return Ok(foundRecipeDto);
+        else
+            return NotFound();
+    }
 }
