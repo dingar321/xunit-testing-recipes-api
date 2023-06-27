@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Recipes.Api.Data;
+using Recipes.Api.Service;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,9 +34,9 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
-    
-// Services:
-builder.Services.AddSingleton<DataContext>();
+
+// My services:
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 
 // Connection string and database service registration
 var connectionString = config.GetConnectionString("DataContext");
