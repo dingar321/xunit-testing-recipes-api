@@ -116,4 +116,16 @@ public class RecipeController : ControllerBase
         else
             return NotFound();
     }
+
+    /// <summary>
+    /// Gets all existing recipes
+    /// </summary>
+    /// <response code="200"> All existing recipes retrieved </response>
+    [HttpGet]
+    [Route("get-all")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IEnumerable<RecipeDto>> GetRecipes()
+    {
+        return await _recipeService.GetRecipes();
+    }
 }
